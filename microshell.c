@@ -127,7 +127,6 @@ void				builtin_cd(t_list *cmd)
 
 void				execute_cmd(t_list *cmd, char **envp)
 {
-	int			ret;
 	pid_t		pid;
 
 	if (cmd->write_pipe && pipe(cmd->pipe) < 0)
@@ -140,13 +139,13 @@ void				execute_cmd(t_list *cmd, char **envp)
 			exit_fatal();
 		else if (cmd->read_pipe && dup2(cmd->prev->pipe[FD_READ], STDIN_FILENO) < 0)
 			exit_fatal();
-		if ((ret = execve(cmd->argv[0], cmd->argv, envp)))
+		if (execve(cmd->argv[0], cmd->argv, envp))
 		{
 			put_error("error: cannot execute ");
 			put_error(cmd->argv[0]);
 			put_error("\n");
 		}
-		exit(ret);
+		exit(-1);
 	}
 	else
 	{
